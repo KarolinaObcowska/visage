@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  generateStaticParams() {
-    return {
-      '/': { page: '/login' },
-    }
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/login',
+        permanent: true,
+      },
+    ]
   },
   async headers() {
     return [
