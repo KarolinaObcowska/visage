@@ -1,14 +1,26 @@
 import Table from '@/components/Table/Table'
 import * as fs from 'fs'
 import * as XLSX from 'xlsx'
+import prisma from '../lib/prisma'
 
+async function handleCreateOrder(data) {
+  const { index, quantity, productDescription, unit } = data
+  const result = await prisma.order.create({
+    data: {
+      index: index,
+      quantity: quantity,
+      product_description: productDescription,
+      unit: unit,
+    },
+  })
+  console.log(result.json())
+}
 async function getData() {
   const excelData = fs.readFileSync('./public/products.xlsx', (err) => {
     if (err) {
       console.log(err.message)
       throw err
     }
-    console.log('data written to file')
   })
   const workbook = XLSX.read(excelData, { type: 'buffer' })
   const sheetName = workbook.SheetNames[0]
@@ -30,7 +42,7 @@ const PartsRequirements = async () => {
 
   return (
     <div className="w-full h-full bg-base-100 py-10 px-12">
-      <Table data={data} />
+      <Table data={data} handleCreateOrder={handleCreateOrder} />
     </div>
   )
 }

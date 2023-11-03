@@ -3,7 +3,7 @@ import { BsChevronDown } from 'react-icons/bs'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-const Table = ({ data }) => {
+const Table = ({ data, handleCreateOrder }) => {
   const [expandedGroups, setExpandedGroups] = useState([])
 
   const { register, handleSubmit } = useForm()
@@ -18,6 +18,7 @@ const Table = ({ data }) => {
   }
 
   const submitForm = async (data) => {
+    handleCreateOrder(data)
     console.log(data)
   }
   return (
