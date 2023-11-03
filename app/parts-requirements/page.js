@@ -1,7 +1,7 @@
 import Table from '@/components/Table/Table'
 import * as fs from 'fs'
 import * as XLSX from 'xlsx'
-import prisma from '../lib/prisma'
+import prisma from '@/lib/prisma'
 
 async function handleCreateOrder(data) {
   const { index, quantity, productDescription, unit } = data
