@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  generateStaticParams: async function () {
+  generateStaticParams() {
     return {
       '/': { page: '/login' },
     }
