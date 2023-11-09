@@ -1,50 +1,42 @@
+'use client'
+import Loader from '@/components/Loader/Loader'
 import Table from '@/components/Table/Table'
-import * as fs from 'fs'
-import * as XLSX from 'xlsx'
-import prisma from '@/lib/prisma'
+import { useEffect, useState } from 'react'
 
-async function handleCreateOrder(data) {
-  const { index, quantity, productDescription, unit } = data
-  const result = await prisma.order.create({
-    data: {
-      index: index,
-      quantity: quantity,
-      product_description: productDescription,
-      unit: unit,
-    },
-  })
-  console.log(result.json())
-}
-async function getData() {
-  const excelData = fs.readFileSync('./public/products.xlsx', (err) => {
-    if (err) {
-      console.log(err.message)
-      throw err
+const PartsRequirements = () => {
+  const [file, setFile] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const fetchExcel = async () => {
+    setLoading(true)
+    const res = await fetch('/api/read-file')
+    const data = await res.json()
+    const convertedFile = await convertData(data.file.content)
+    setFile(convertedFile)
+    setLoading(false)
+  }
+
+  const convertData = async (data) => {
+    const convertedData = {}
+
+    for (const key in data) {
+      const value = data[key]
+      const groupName = value['Nazwa grupy']
+
+      if (!convertedData[groupName]) {
+        convertedData[groupName] = []
+      }
+
+      convertedData[groupName].push(value)
     }
-  })
-  const workbook = XLSX.read(excelData, { type: 'buffer' })
-  const sheetName = workbook.SheetNames[0]
-  const sheet = workbook.Sheets[sheetName]
-  const data = XLSX.utils.sheet_to_json(sheet)
-  const groupedData = {}
-  data.forEach((row) => {
-    const group = row['Nazwa grupy']
-    if (!groupedData[group]) {
-      groupedData[group] = []
-    }
-    groupedData[group].push(row)
-  })
-  return groupedData
-}
+    return convertedData
+  }
 
-const PartsRequirements = async () => {
-  const data = await getData()
+  useEffect(() => {
+    fetchExcel()
+  }, [])
 
-  return (
-    <div className="w-full h-full bg-base-100 py-10 px-12">
-      <Table data={data} handleCreateOrder={handleCreateOrder} />
-    </div>
-  )
+  return <div className="w-full h-full bg-base-100 ">{loading && !file ? <Loader /> : <Table data={file} />}</div>
 }
 
 export default PartsRequirements

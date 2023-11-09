@@ -3,14 +3,41 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") 
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Order {
-  index                String     @unique    
-  product_description  String
-  quantity             String
-  unit                 String  
+model Users {
+  id         Int          @id @default(autoincrement())
+  firstLogin Boolean      
+  email      String       @unique
+  password   String?
+  orders     Orders[]
+  role       String
+}
+
+model Orders {
+  order_id   Int          @id @default(autoincrement())
+  id         Int
+  order_date DateTime
+  user       Users        @relation(fields: [id], references: [id])
+  orderItems OrderItems[]
+}
+
+model OrderItems {
+  order_item_id Int    @id @default(autoincrement())
+  order_id      Int
+  product_id    String    
+  jm            String
+  quantity      Int
+  product_name  String
+  notes         String
+  order         Orders @relation(fields: [order_id], references: [order_id])
+}
+
+model ExcelFile {
+  id          Int @id @default(autoincrement())
+  name        String
+  content     Json
 }
